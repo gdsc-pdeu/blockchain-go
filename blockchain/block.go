@@ -55,6 +55,8 @@ func InitBlockchain() *Blockchain {
 
 // --------------------------------------------------------------------
 
+// temporary derive hashing function.
+// TODO: add a more sophisticated function in proof.go
 func (b *Block) DeriveHash() {
 
 	// join data and prevHash

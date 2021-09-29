@@ -1,6 +1,9 @@
 package blockchain
 
-import "math/big"
+import (
+	"bytes"
+	"math/big"
+)
 
 /*
 	Proof of Work (PoW):
@@ -38,4 +41,16 @@ func NewProofOfWork(b *Block) *ProofOfWork {
 
 	pow := ProofOfWork{b, target}
 	return &pow
+}
+
+func (pow *ProofOfWork) InitData(nonce int64) []byte {
+	// join block data, prevhash, nonce and difficulty
+	data := bytes.Join([][]byte{
+		[]byte(pow.Block.Data),
+		pow.Block.PrevHash,
+		IntToByteSlice(int64(nonce)),
+		IntToByteSlice(int64(Difficulty)),
+	}, []byte{})
+
+	return data
 }
