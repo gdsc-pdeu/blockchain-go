@@ -7,3 +7,8 @@ Example:
 
 
 ![Blockchain in Go](assets/img.png)
+
+
+# Author
+
+<a href="https://github.com/Maharshi-Pandya">Maharshi Pandya</a>
