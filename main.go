@@ -14,9 +14,9 @@ func main() {
 
 	chain := blockchain.InitBlockchain()
 
-	chain.AddBlock("First Block after Genesis")
-	chain.AddBlock("Second Block after Genesis")
-	chain.AddBlock("Third Block after Genesis")
+	chain.AddBlock("Alice sent Bob 10 ImCoins")
+	chain.AddBlock("Bob sent Charlie 40 ImCoins")
+	chain.AddBlock("Alice sent Charlie 2 ImCoins")
 
 	// view the chain
 	for _, block := range chain.Blocks {
