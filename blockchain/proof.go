@@ -2,6 +2,9 @@ package blockchain
 
 import (
 	"bytes"
+	"crypto/sha256"
+	"fmt"
+	"math"
 	"math/big"
 )
 
@@ -23,7 +26,7 @@ import (
 	- Check if the hash meets the requirements
 */
 
-const Difficulty = 12
+const Difficulty = 18
 
 // PoW struct
 type ProofOfWork struct {
@@ -43,6 +46,53 @@ func NewProofOfWork(b *Block) *ProofOfWork {
 	return &pow
 }
 
+// "Work" to mine the blocks and derive the hashes of a block
+// Returns: Nonce and Derived Hash of the block
+func (pow *ProofOfWork) Mine() (int, []byte) {
+	var intHash big.Int
+	var hash [32]byte
+
+	nonce := 0
+
+	// loop through every int
+	for nonce < math.MaxInt64 {
+		data := pow.InitData(int64(nonce))
+		hash = sha256.Sum256(data)
+
+		fmt.Printf("\r%x", hash)
+
+		// compare the hash with the target
+		// big.Int.Cmp returns:
+		// -1 if x < y
+		// 0 if x == y
+		// 1 if  x > y
+		intHash.SetBytes(hash[:])
+		if intHash.Cmp(pow.Target) == -1 {
+			break
+		} else {
+			nonce++
+		}
+	}
+
+	return nonce, hash[:]
+}
+
+// Once mined, validate the block
+func (pow *ProofOfWork) Validate() bool {
+	// init the data,
+	// calculate hash from the derived nonce and compare
+
+	var intHash big.Int
+
+	data := pow.InitData(int64(pow.Block.Nonce))
+	hash := sha256.Sum256(data)
+
+	intHash.SetBytes(hash[:])
+
+	return intHash.Cmp(pow.Target) == -1
+}
+
+// Join blockData, PrevHash, Nonce and Difficulty
 func (pow *ProofOfWork) InitData(nonce int64) []byte {
 	// join block data, prevhash, nonce and difficulty
 	data := bytes.Join([][]byte{

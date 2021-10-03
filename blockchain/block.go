@@ -1,10 +1,5 @@
 package blockchain
 
-import (
-	"bytes"
-	"crypto/sha256"
-)
-
 // chain of blocks
 type Blockchain struct {
 	Blocks []*Block
@@ -18,6 +13,7 @@ type Block struct {
 	Hash     []byte
 	Data     []byte
 	PrevHash []byte
+	Nonce    int
 
 	// Methods:
 	// DeriveHash(): Set the Hash of current block
@@ -37,8 +33,16 @@ func (chain *Blockchain) AddBlock(data string) {
 
 func CreateBlock(data string, prevHash []byte) *Block {
 	// init a new block and derive its hash
-	newBlock := &Block{[]byte{}, []byte(data), prevHash}
-	newBlock.DeriveHash()
+	newBlock := &Block{[]byte{}, []byte(data), prevHash, 0}
+
+	// init a new pow to mine the block
+	pow := NewProofOfWork(newBlock)
+	nonce, hash := pow.Mine()
+
+	// set the hash and nonce for the block
+	newBlock.Hash = hash[:]
+	newBlock.Nonce = nonce
+
 	return newBlock
 }
 
@@ -55,16 +59,16 @@ func InitBlockchain() *Blockchain {
 
 // --------------------------------------------------------------------
 
-// temporary derive hashing function.
-// TODO: add a more sophisticated function in proof.go
-func (b *Block) DeriveHash() {
+// // temporary derive hashing function.
+// // TODO: add a more sophisticated function in proof.go
+// func (b *Block) DeriveHash() {
 
-	// join data and prevHash
-	info := bytes.Join([][]byte{b.Data, b.PrevHash}, []byte{})
+// 	// join data and prevHash
+// 	info := bytes.Join([][]byte{b.Data, b.PrevHash}, []byte{})
 
-	// digest the info
-	hash := sha256.Sum256(info)
+// 	// digest the info
+// 	hash := sha256.Sum256(info)
 
-	// set the hash of the block
-	b.Hash = hash[:]
-}
+// 	// set the hash of the block
+// 	b.Hash = hash[:]
+// }
