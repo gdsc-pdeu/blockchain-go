@@ -1,5 +1,11 @@
 package blockchain
 
+import (
+	"bytes"
+	"encoding/gob"
+	"log"
+)
+
 // chain of blocks
 type Blockchain struct {
 	Blocks []*Block
@@ -57,18 +63,35 @@ func InitBlockchain() *Blockchain {
 	return ch
 }
 
-// --------------------------------------------------------------------
+// TODO: create serializing and deserializing functions to convert the Block
+// into a byte array and vice versa for storing in badger database
+func (block *Block) ToByteSlice() []byte {
+	var buf bytes.Buffer
 
-// // temporary derive hashing function.
-// // TODO: add a more sophisticated function in proof.go
-// func (b *Block) DeriveHash() {
+	// gob encoder
+	encoder := gob.NewEncoder(&buf)
+	err := encoder.Encode(block)
 
-// 	// join data and prevHash
-// 	info := bytes.Join([][]byte{b.Data, b.PrevHash}, []byte{})
+	Handle(err)
 
-// 	// digest the info
-// 	hash := sha256.Sum256(info)
+	return buf.Bytes()
+}
 
-// 	// set the hash of the block
-// 	b.Hash = hash[:]
-// }
+func FromByteSlice(serial []byte) *Block {
+	var block Block
+
+	// gob decoder
+	decoder := gob.NewDecoder(bytes.NewReader(serial))
+	err := decoder.Decode(&block)
+
+	Handle(err)
+
+	return &block
+}
+
+// Error handling
+func Handle(err error) {
+	if err != nil {
+		log.Panic(err)
+	}
+}

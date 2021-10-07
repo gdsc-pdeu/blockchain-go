@@ -8,7 +8,7 @@ A simple implementation of the idea behind Blockchain in [Golang](https://golang
 Example:
 
 
-![Blockchain in Go](assets/img.png)
+![Blockchain in Go](assets/pow.png)
 
 # Resources for Learning
 
