@@ -29,3 +29,10 @@ Where, `[Tag]` can be any of these:
 - :memo: `:memo:` (Documentation changes)
 - :art: `:art:` (Code formatting)
 - :hammer: `:hammer:` (Code refactoring)
+
+<h2>Features you can develop</h2>
+
+Here is a non-exhaustive list of features that can be added into this project
+
+![Features to be added](../assets/WhatCanYouContrib.svg)
+

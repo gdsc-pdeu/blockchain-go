@@ -12,7 +12,7 @@ Example:
 
 # Resources for Learning
 
-## Blog
+## Blogs
 
 - [Build Blockchain From Scratch With Go](https://www.freecodecamp.org/news/build-a-blockchain-in-golang-from-scratch/)
 
@@ -22,13 +22,17 @@ Example:
 
 - [Ethereum for Go Developer](https://ethereum.org/en/developers/docs/programming-languages/golang/)
 
-## Tutorial
+## Tutorials
 
 - [Bockchain App in Go](https://www.youtube.com/watch?v=Crw97KjIe6o)
 
 - [Complete playlist in Golang](https://www.youtube.com/watch?v=mYlHT9bB6OE&list=PLpP5MQvVi4PGmNYGEsShrlvuE2B33xV1L)
 
-- [Use Golang for connecting with Ethereum](https://www.youtube.com/watch?v=-7uChuO_VzM) 
+- [Use Golang for connecting with Ethereum](https://www.youtube.com/watch?v=-7uChuO_VzM)
+
+# Contributing to this project
+
+Check out the :tada: [Contributing Guidelines](https://github.com/Maharshi-Pandya/blockchain-go/blob/dev/docs/CONTRIBUTING.md) :tada: on how to contribute to this project and to read about what features can be included in Blockchain-Go.
 
 # Author
 
