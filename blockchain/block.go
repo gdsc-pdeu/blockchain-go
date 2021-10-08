@@ -1,17 +1,20 @@
 package blockchain
 
 import (
-	"bytes"
-	"encoding/gob"
-	"log"
+	"fmt"
+
+	badger "github.com/dgraph-io/badger/v3"
+)
+
+// define the db options
+const (
+	dbPath = "./tmp/blocks"
 )
 
 // chain of blocks
 type Blockchain struct {
-	Blocks []*Block
-
-	// Methods:
-	// AddBlock(): Adds the Block to the Blockchain using data
+	LastHash []byte
+	Database *badger.DB
 }
 
 // individual block
@@ -20,19 +23,37 @@ type Block struct {
 	Data     []byte
 	PrevHash []byte
 	Nonce    int
-
-	// Methods:
-	// DeriveHash(): Set the Hash of current block
 }
 
 // ---------------------------------------------------------------------
 
 func (chain *Blockchain) AddBlock(data string) {
-	// create the block and append
-	prevBlock := chain.Blocks[len(chain.Blocks)-1]
-	newBlock := CreateBlock(data, prevBlock.Hash)
+	var lastHash []byte
 
-	chain.Blocks = append(chain.Blocks, newBlock)
+	// 1) View the db to find the hash of the last block
+	err := chain.Database.View(func(txn *badger.Txn) error {
+		item, err := txn.Get([]byte("lh"))
+		Handle(err)
+		lastHash, err = item.ValueCopy(nil)
+
+		return err
+	})
+	Handle(err)
+
+	// 2) Update the db by creating a new block and setting the key to appropriate hash
+	newBlock := CreateBlock(data, lastHash)
+
+	err = chain.Database.Update(func(txn *badger.Txn) error {
+		err := txn.Set(newBlock.Hash, newBlock.ToByteSlice())
+		Handle(err)
+		err = txn.Set([]byte("lh"), newBlock.Hash)
+
+		// set the in memory lastHash
+		chain.LastHash = newBlock.Hash
+
+		return err
+	})
+	Handle(err)
 }
 
 // ---------------------------------------------------------------------------
@@ -57,41 +78,43 @@ func Genesis() *Block {
 	return CreateBlock("Genesis", []byte{})
 }
 
+// init the database and store the genesis block
 func InitBlockchain() *Blockchain {
-	bls := []*Block{Genesis()}
-	ch := &Blockchain{bls}
-	return ch
-}
+	// to store the hash of last block in memory
+	var lastHash []byte
 
-// TODO: create serializing and deserializing functions to convert the Block
-// into a byte array and vice versa for storing in badger database
-func (block *Block) ToByteSlice() []byte {
-	var buf bytes.Buffer
-
-	// gob encoder
-	encoder := gob.NewEncoder(&buf)
-	err := encoder.Encode(block)
-
+	// open the database
+	opts := badger.DefaultOptions(dbPath)
+	db, err := badger.Open(opts)
 	Handle(err)
 
-	return buf.Bytes()
-}
+	// check if the key "lh" exists already
+	err = db.Update(func(txn *badger.Txn) error {
+		if _, err := txn.Get([]byte("lh")); err == badger.ErrKeyNotFound {
+			fmt.Println("::-> No blockchain found. Creating one...")
+			genesis := Genesis()
+			fmt.Println("::-> Found the genesis block...")
 
-func FromByteSlice(serial []byte) *Block {
-	var block Block
+			err = txn.Set(genesis.Hash, genesis.ToByteSlice())
+			Handle(err)
 
-	// gob decoder
-	decoder := gob.NewDecoder(bytes.NewReader(serial))
-	err := decoder.Decode(&block)
+			// set the lh key to last block's hash
+			err = txn.Set([]byte("lh"), genesis.Hash)
 
+			// set the in memory lastHash
+			lastHash = genesis.Hash
+
+			return err
+		} else {
+			item, err := txn.Get([]byte("lh"))
+			Handle(err)
+			lastHash, err = item.ValueCopy(nil)
+			return err
+		}
+	})
 	Handle(err)
 
-	return &block
-}
-
-// Error handling
-func Handle(err error) {
-	if err != nil {
-		log.Panic(err)
-	}
+	// init the blockchain
+	blockchain := Blockchain{lastHash, db}
+	return &blockchain
 }
