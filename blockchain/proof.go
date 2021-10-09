@@ -100,6 +100,7 @@ func (pow *ProofOfWork) InitData(nonce int64) []byte {
 		pow.Block.PrevHash,
 		IntToByteSlice(int64(nonce)),
 		IntToByteSlice(int64(Difficulty)),
+		IntToByteSlice(pow.Block.TimeStamp),
 	}, []byte{})
 
 	return data
