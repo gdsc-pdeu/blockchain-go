@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strconv"
 
 	"github.com/Maharshi-Pandya/blockchain-go/blockchain"
 )
@@ -33,12 +34,31 @@ func (cli *CommandLineInterface) validateArgs() {
 // command : Add Block
 func (cli *CommandLineInterface) AddBlockCmd(data string) {
 	cli.Chain.AddBlock(data)
-	fmt.Println("Added block into the chain ✔️")
+	fmt.Println("\nAdded block into the chain ✔️")
 }
 
 // command : print the chain
 func (cli *CommandLineInterface) PrintChainCmd() {
+	iter := cli.Chain.InitIterator()
 
+	// loop through the chain
+	for {
+		nextBlock := iter.Next()
+
+		fmt.Printf("\nPrevious Hash: %x\n", nextBlock.PrevHash)
+		fmt.Printf("Data: %s\n", nextBlock.Data)
+		fmt.Printf("Hash: %x\n", nextBlock.Hash)
+		fmt.Printf("Timestamp: %v\n", nextBlock.TimeStamp)
+
+		pow := blockchain.NewProofOfWork(nextBlock)
+		fmt.Printf("PoW validated: %s\n", strconv.FormatBool(pow.Validate()))
+		fmt.Println()
+
+		// check if we reach the genesis block
+		if len(nextBlock.PrevHash) == 0 {
+			break
+		}
+	}
 }
 
 // Run the CLI
@@ -72,5 +92,9 @@ func (cli *CommandLineInterface) Run() {
 			runtime.Goexit()
 		}
 		cli.AddBlockCmd(*addBlockCmdData)
+	}
+	if printChainSubCmd.Parsed() {
+		// print the blockchain
+		cli.PrintChainCmd()
 	}
 }
