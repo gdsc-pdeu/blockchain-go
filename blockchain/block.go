@@ -91,8 +91,10 @@ func InitBlockchain() *Blockchain {
 	// to store the hash of last block in memory
 	var lastHash []byte
 
-	// open the database
+	// open the database and set logging to nil
 	opts := badger.DefaultOptions(dbPath)
+	opts.Logger = nil
+
 	db, err := badger.Open(opts)
 	Handle(err)
 
