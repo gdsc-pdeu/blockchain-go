@@ -5,10 +5,10 @@
 A simple implementation of the idea behind Blockchain in [Golang](https://golang.org/) using packages like
 `bytes` and `crypto` which are a part of [Golang's Standard Library](https://pkg.go.dev/std).
 
-Example:
+Example program run:
 
 
-![Blockchain in Go](assets/pow.png)
+![Blockchain in Go](assets/CLI.gif)
 
 # Resources for Learning
 
