@@ -1,0 +1,51 @@
+To incorporate transactions, we need a struct to implement.
+
+struct Transaction:
+	TxID : byte slice
+	TxInputs : TxInput
+	TxOutputs : TxOutput
+
+TxInput: It is a struct that stores the previous TxID (if any), an integer representing the TxOutput it is associated to and a Signature(string, name for now)
+
+TxOutput: It is a struct which stores Value to be transferred and a PubKey (string, name for now)
+
+struct TxInput:
+	Id : byte slice
+	Outidx : int
+	Sig : string
+
+struct TxOutput:
+	Value : number
+	PubKey : string
+
+---
+
+Coinbase method on Transaction structure:
+This is the first transaction ever. So, its inputs will comprise of no previous outputs.
+It takes two parameters: to and data both strings
+
+Hence first TxInput is:
+	Id : []byte{}
+	Outidx : -1
+	Sig : data
+
+First TxOutput is:
+	Value : 100
+	PubKey : to
+
+First Transaction is:
+Transaction{nil, TxInput{[]byte{}, -1, data}, TxOutput{100, to}}
+
+after that we setId of this coinbase transaction.
+
+---
+
+We need to check if the data inside our inputs and outputs can be unlocked. VERIFICATION!!!
+
+CanUnlock method on TxInput:
+Accepts one parameter: data (string, for now)
+check if the Sig is equal to data
+
+CanBeUnlocked method on TxOutput:
+Accepts one parameter: data (string, for now)
+check if the PubKey is equal to data

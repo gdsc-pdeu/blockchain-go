@@ -1,0 +1,20 @@
+name: Go build workflow
+
+on:
+  push:
+    branches: ["master", "dev"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    # main workflow hereafter
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.17.1
+      
+    - name: Build the app
+      run: go build
